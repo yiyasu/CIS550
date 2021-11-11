@@ -11,9 +11,13 @@
 
 * ~/Populate_Database
   * Contains .sql files used to populate the databases. 
-  
-* ~/Files
-  * Contains .pdf milestone reports and .csv datasets.
+
+
+* ~/Files 
+  * Contains .pdf milestone reports.
+ 
+* ~/Files/Datasets 
+  * Contains compressed .csv datasets.
 
    
 
