@@ -6,6 +6,17 @@
 
 #### Table of Contents:
 
+* ~/DDL_DML
+  *
+
+* ~/Populate_Database
+  * Contains .sql files used to populate the databases. 
+  
+* ~/Files
+  * Contains .pdf milestone reports and .csv datasets.
+
+   
+
 
 
 
