@@ -1,0 +1,10 @@
+{
+    "rds_host": "project-550.cukrtkrkrhlj.us-east-1.rds.amazonaws.com",
+    "rds_port": "3306",
+    "rds_user": "airbnb_admin",
+    "rds_password" : "Boston550",
+    "rds_db": "AirBnB_Project",
+    "server_host": "127.0.0.1",
+    "server_port":"8080"
+
+}
