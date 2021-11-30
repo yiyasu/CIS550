@@ -7,10 +7,7 @@
 #### Table of Contents:
 
 * ~/Backend
- 
-
-* ~/Populate_Database
-  * Contains .sql files used to populate the databases. 
+  * Contains .js files.
 
 
 * ~/Files 
