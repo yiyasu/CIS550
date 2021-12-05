@@ -148,28 +148,32 @@ async function host(req, res) {
     );
   }
 }
-async function numberbookings(req, res){
-    var date = "`date`"
-    if (req.query.listing){
-        connection.query(`SELECT listing_id, MONTH(STR_TO_DATE('${date}', '%Y-%m-%d')) AS month, count(*) From
+
+// get number of bookings for a listing by month
+async function numberbookings(req, res) {
+  var date = "`date`";
+  if (req.query.listing) {
+    connection.query(
+      `SELECT listing_id, MONTH(STR_TO_DATE(${date}, '%Y-%m-%d')) AS month, count(*) From
         Calendar
         WHERE listing_id = '${req.query.listing}'
         GROUP BY month
         ORDER BY month
-        `, function (error, results, fields) {
-
-            if (error) {
-                console.log(error)
-                res.json({ error: error })
-            } else if (results) {
-                res.json({ results: results })
-            }
-        });
+        `,
+      function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          res.json({ error: error });
+        } else if (results) {
+          res.json({ results: results });
+        }
       }
-    }
+    );
+  }
+}
 module.exports = {
   hello,
   listing,
   host,
-  numberbookings
+  numberbookings,
 };
