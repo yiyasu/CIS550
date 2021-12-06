@@ -111,7 +111,7 @@ async function host(req, res) {
   const hostId = req.query.id;
   console.log(hostId);
   if (!hostId) {
-    res.status(404).json({ message: "id not selected" });
+    res.status(404).json({ message: "id not specified" });
   } else {
     connection.query(
       `select
@@ -240,7 +240,104 @@ async function increment_views(req, res) {
       }
     );
   } else {
-    res.json({ error: "id not specified" });
+    res.status(404).json({ message: "id not specified" });
+  }
+}
+
+// average price for a listing by month
+// price is null when the listings is not available or booked dut=ring that month
+async function monthly_prices(req, res) {
+  const date = "`date`";
+  if (req.query.id) {
+    connection.query(
+      `SELECT MONTH(STR_TO_DATE(${date}, '%Y-%m-%d')) AS month, avg(price) as average_price
+       From Calendar
+       WHERE listing_id = ${req.query.id}
+       GROUP BY month
+       ORDER BY month;`,
+      function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          res.json({ error: error });
+        } else if (results) {
+          res.json({ message: results });
+        }
+      }
+    );
+  } else {
+    res.status(404).json({ message: "id not specified" });
+  }
+}
+
+// reviews for a particular listing with pagination
+async function reviews(req, res) {
+  pagesize = req.query.pagesize ? req.query.pagesize : 10;
+  row_num = !isNaN(req.query.page) ? (+req.query.page - 1) * pagesize : 0;
+  if (req.query.id) {
+    connection.query(
+      `SELECT l.id, r.reviewer_id, r.reviewer_name, r.comments, r.date
+     FROM Listing l, Reviews r
+     WHERE r.listing_id = l.id and l.id = ${req.query.id}
+     LIMIT ${row_num},${pagesize};`,
+      function (error, results, fields) {
+        if (error) {
+          res.json({ error: error });
+        } else if (results) {
+          res.json({ results: results });
+        }
+      }
+    );
+  } else {
+    res.status(404).json({ message: "id not specified" });
+  }
+}
+
+// frequency of bookings within certain temperature ranges
+// display on the main listings page not for particular listing
+async function bookings_with_temp(req, res) {
+  connection.query(
+    `With booking_temps AS ( SELECT w.date as date, w.avg_temp as temp
+      FROM Calendar c
+      INNER JOIN Weather w ON c.date = w.date )
+      select floor(temp/10)*10 as range_floor, count(*)
+      from booking_temps
+           group by 1
+           order by 1;
+    `,
+    function (error, results, fields) {
+      if (error) {
+        res.json({ error: error });
+      } else if (results) {
+        res.json({ results: results });
+      }
+    }
+  );
+}
+
+// change in price with average temp for a listing
+// 5506 = id
+async function price_with_temp(req, res) {
+  if (req.query.id) {
+    connection.query(
+      `With booking_temps AS ( SELECT c.listing_id, c.price, w.date as date, w.avg_temp as temp
+      FROM Calendar c
+      INNER JOIN Weather w ON c.date = w.date )
+      select floor(temp/10)*10 as range_floor, listing_id, round(avg(price),2) as average_price
+      from booking_temps
+      where listing_id = 5506
+      group by range_floor, listing_id
+      order by range_floor;
+    `,
+      function (error, results, fields) {
+        if (error) {
+          res.json({ error: error });
+        } else if (results) {
+          res.json({ results: results });
+        }
+      }
+    );
+  } else {
+    res.status(404).json({ message: "id not specified" });
   }
 }
 module.exports = {
@@ -251,4 +348,8 @@ module.exports = {
   all_hosts,
   all_listings,
   increment_views,
+  monthly_prices,
+  reviews,
+  bookings_with_temp,
+  price_with_temp,
 };
