@@ -24,36 +24,22 @@ async function all_listings(req, res) {
   row_num = !isNaN(req.query.page) ? (+req.query.page - 1) * pagesize : 0;
 
   connection.query(
-    `Select l.id, round(avg(c.price),2) as price
-    FROM Listing l LEFT JOIN Calendar c ON l.id = c.listing_id
-    group by l.id
-    order by l.id
-    LIMIT ${row_num},${pagesize}`,
-    function (error, results1, fields) {
+    `WITH Price as (Select l.id as id, round(avg(c.price),2) as price
+     FROM Listing l LEFT JOIN Calendar c ON l.id = c.listing_id
+     group by l.id)
+     select l.id, l.num_views, l.name, l.summary, p.price, count(r.reviewer_id) as '#reviews'
+     FROM Listing l LEFT JOIN Reviews r
+     ON l.id  = r.listing_id
+     LEFT JOIN Price p
+     ON l.id = p.id
+     group by l.id
+     order by l.id
+     LIMIT ${row_num},${pagesize}`,
+    function (error, results, fields) {
       if (error) {
         res.json({ error: error });
-      } else if (results1) {
-        connection.query(
-          ` select l.id, l.num_views, l.name, l.summary, count(r.reviewer_id) as '#reviews'
-          FROM Listing l LEFT JOIN Reviews r
-          ON l.id  = r.listing_id
-          group by l.id
-          order by l.id
-          LIMIT ${row_num},${pagesize};`,
-          function (error, results2, fields) {
-            if (error) {
-              res.json({ error: error });
-            } else if (results2) {
-              console.log(results1);
-              console.log(results2);
-              final_results = results1.map((res, index) => ({
-                ...res,
-                ...results2[index],
-              }));
-              res.json({ results: final_results });
-            }
-          }
-        );
+      } else if (results) {
+        res.json({ results: results });
       }
     }
   );
