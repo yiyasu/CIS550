@@ -27,7 +27,7 @@ async function all_listings(req, res) {
     `WITH Price as (Select l.id as id, round(avg(c.price),2) as price
      FROM Listing l LEFT JOIN Calendar c ON l.id = c.listing_id
      group by l.id)
-     select l.id, l.num_views, l.name, l.summary, p.price, count(r.reviewer_id) as '#reviews'
+     select l.id, l.num_views, l.name, l.summary, l.thumbnail_url, p.price, count(r.reviewer_id) as '#reviews'
      FROM Listing l LEFT JOIN Reviews r
      ON l.id  = r.listing_id
      LEFT JOIN Price p
@@ -205,7 +205,8 @@ async function numberbookings(req, res) {
   var date = "`date`";
   if (req.query.listing) {
     connection.query(
-      `SELECT listing_id, MONTH(STR_TO_DATE(${date}, '%Y-%m-%d')) AS month, count(*) From
+      `SELECT listing_id, MONTH(STR_TO_DATE(${date}, '%Y-%m-%d')) AS month, count(*) as count
+       From
         Calendar
         WHERE listing_id = '${req.query.listing}'
         GROUP BY month
@@ -220,6 +221,8 @@ async function numberbookings(req, res) {
         }
       }
     );
+  } else {
+    res.status(404).json({ message: "id not specified" });
   }
 }
 
@@ -299,7 +302,7 @@ async function bookings_with_temp(req, res) {
     `With booking_temps AS ( SELECT w.date as date, w.avg_temp as temp
       FROM Calendar c
       INNER JOIN Weather w ON c.date = w.date )
-      select floor(temp/10)*10 as range_floor, count(*)
+      select floor(temp/10)*10 as range_floor, count(*) as count
       from booking_temps
            group by 1
            order by 1;
