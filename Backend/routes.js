@@ -18,6 +18,71 @@ async function hello(req, res) {
     res.send(`Hello! Welcome to the AirBnB server!`);
   }
 }
+// info of all listings for table
+async function all_listings(req, res) {
+  pagesize = req.query.pagesize ? req.query.pagesize : 10;
+  row_num = !isNaN(req.query.page) ? (+req.query.page - 1) * pagesize : 0;
+
+  connection.query(
+    `Select l.id, round(avg(c.price),2) as price
+    FROM Listing l LEFT JOIN Calendar c ON l.id = c.listing_id
+    group by l.id
+    order by l.id
+    LIMIT ${row_num},${pagesize}`,
+    function (error, results1, fields) {
+      if (error) {
+        res.json({ error: error });
+      } else if (results1) {
+        connection.query(
+          ` select l.id, l.num_views, l.name, l.summary, count(r.reviewer_id) as '#reviews'
+          FROM Listing l LEFT JOIN Reviews r
+          ON l.id  = r.listing_id
+          group by l.id
+          order by l.id
+          LIMIT ${row_num},${pagesize};`,
+          function (error, results2, fields) {
+            if (error) {
+              res.json({ error: error });
+            } else if (results2) {
+              console.log(results1);
+              console.log(results2);
+              final_results = results1.map((res, index) => ({
+                ...res,
+                ...results2[index],
+              }));
+              res.json({ results: final_results });
+            }
+          }
+        );
+      }
+    }
+  );
+}
+
+// info of all hosts for table
+async function all_hosts(req, res) {
+  pagesize = req.query.pagesize ? req.query.pagesize : 10;
+  row_num = !isNaN(req.query.page) ? (+req.query.page - 1) * pagesize : 0;
+  connection.query(
+    `SELECT
+       host_id,
+       host_name,
+       host_about,
+       host_response_rate,
+       host_response_time,
+       host_acceptance_rate,
+       host_total_listings_count
+       FROM Host
+       LIMIT ${row_num},${pagesize}`,
+    function (error, results, fields) {
+      if (error) {
+        res.json({ error: error });
+      } else if (results) {
+        res.json({ results: results });
+      }
+    }
+  );
+}
 
 // info for 1 listing by id
 async function listing(req, res) {
@@ -171,9 +236,33 @@ async function numberbookings(req, res) {
     );
   }
 }
+
+// increment views
+async function increment_views(req, res) {
+  if (req.query.id) {
+    connection.query(
+      `update Listing set num_views = num_views + 1
+       where id = ${req.query.id};
+        `,
+      function (error, results, fields) {
+        if (error) {
+          console.log(error);
+          res.json({ error: error });
+        } else if (results) {
+          res.json({ message: "success" });
+        }
+      }
+    );
+  } else {
+    res.json({ error: "id not specified" });
+  }
+}
 module.exports = {
   hello,
   listing,
   host,
   numberbookings,
+  all_hosts,
+  all_listings,
+  increment_views,
 };
