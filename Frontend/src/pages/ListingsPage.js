@@ -1,7 +1,8 @@
 import React from "react";
+import { withRouter } from "react-router-dom";
 import { getAllListings } from "../fetcher";
 import { trimLength } from "../utils";
-import Container from "../components/Container";
+import MainContainer from "../components/MainContainer";
 import GridContainer from "../components/GridContainer";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { Card, CardTitle, CardImg, CardBody, CardFooter } from "shards-react";
@@ -34,18 +35,25 @@ class ListingsPage extends React.Component {
     });
   };
 
+  updateRoute = (id) => {
+    this.props.history.push(`/listing/${id}`);
+  };
+
   render() {
     return (
       <div>
         <MenuBar />
-        <Container>
+        <MainContainer>
           <h1>Listings</h1>
           <LoadingIndicator isLoading={this.state.listingResults.length === 0}>
             <GridContainer>
               {this.state.listingResults.map(
                 ({ name, summary, price, thumbnail_url, num_reviews, id }) => (
                   <div key={id} style={{ margin: "1rem 2rem 1rem 0" }}>
-                    <Card style={{ maxWidth: "300px" }}>
+                    <Card
+                      style={{ maxWidth: "300px", cursor: "pointer" }}
+                      onClick={() => this.updateRoute(id)}
+                    >
                       <CardImg
                         src={
                           thumbnail_url
@@ -96,10 +104,10 @@ class ListingsPage extends React.Component {
               />
             </div>
           </LoadingIndicator>
-        </Container>
+        </MainContainer>
       </div>
     );
   }
 }
 
-export default ListingsPage;
+export default withRouter(ListingsPage);

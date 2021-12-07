@@ -1,5 +1,5 @@
 import React from "react";
-import Container from "../components/Container";
+import MainContainer from "../components/MainContainer";
 
 import MenuBar from "../components/MenuBar";
 
@@ -8,10 +8,10 @@ class HomePage extends React.Component {
     return (
       <div>
         <MenuBar />
-        <Container>
+        <MainContainer>
           <h1>Home Page</h1>
           <p>Add stuff here</p>
-        </Container>
+        </MainContainer>
       </div>
     );
   }

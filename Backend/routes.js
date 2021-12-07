@@ -180,20 +180,22 @@ async function host(req, res) {
             })
           );
           res.json({
-            host_id,
-            host_name,
-            host_since,
-            host_location,
-            host_about,
-            host_response_time,
-            host_response_rate,
-            host_acceptance_rate,
-            host_is_superhost,
-            host_thumbnail_url,
-            host_picture_url,
-            host_total_listings_count,
-            host_has_profile_pic,
-            listings,
+            hostDetails: {
+              host_id,
+              host_name,
+              host_since,
+              host_location,
+              host_about,
+              host_response_time,
+              host_response_rate,
+              host_acceptance_rate,
+              host_is_superhost,
+              host_thumbnail_url,
+              host_picture_url,
+              host_total_listings_count,
+              host_has_profile_pic,
+              listings,
+            },
           });
         }
       }

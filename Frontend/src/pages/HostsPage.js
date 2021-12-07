@@ -1,7 +1,8 @@
 import React from "react";
+import { withRouter } from "react-router";
 import { getAllHosts } from "../fetcher";
 import { trimLength } from "../utils";
-import Container from "../components/Container";
+import MainContainer from "../components/MainContainer";
 import GridContainer from "../components/GridContainer";
 import LoadingIndicator from "../components/LoadingIndicator";
 import { Card, CardTitle, CardBody, CardFooter } from "shards-react";
@@ -36,11 +37,15 @@ class HostsPage extends React.Component {
     });
   };
 
+  updateRoute = (id) => {
+    this.props.history.push(`/host/${id}`);
+  };
+
   render() {
     return (
       <div>
         <MenuBar />
-        <Container>
+        <MainContainer>
           <h1>Hosts</h1>
           <LoadingIndicator isLoading={this.state.hostsResults.length === 0}>
             <GridContainer>
@@ -53,7 +58,10 @@ class HostsPage extends React.Component {
                   host_picture_url,
                 }) => (
                   <div key={host_id} style={{ margin: "1rem 2rem 1rem 0" }}>
-                    <Card style={{ width: "300px" }}>
+                    <Card
+                      style={{ width: "300px", cursor: "pointer" }}
+                      onClick={() => this.updateRoute(host_id)}
+                    >
                       <div style={{ margin: "1.5rem auto 0rem auto" }}>
                         <Avatar
                           src={host_picture_url}
@@ -85,10 +93,10 @@ class HostsPage extends React.Component {
               />
             </div>
           </LoadingIndicator>
-        </Container>
+        </MainContainer>
       </div>
     );
   }
 }
 
-export default HostsPage;
+export default withRouter(HostsPage);

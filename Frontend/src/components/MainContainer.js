@@ -1,10 +1,10 @@
 import React from "react";
 
-function Container({ children }) {
+function MainContainer({ children, width }) {
   return (
     <div
       style={{
-        width: "90%",
+        width: width ? width : "90%",
         maxWidth: "760",
         margin: "1.5rem auto 0 auto",
       }}
@@ -14,4 +14,4 @@ function Container({ children }) {
   );
 }
 
-export default Container;
+export default MainContainer;
