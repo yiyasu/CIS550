@@ -1,11 +1,12 @@
 const express = require("express");
 const mysql = require("mysql");
+var cors = require("cors");
 
 const routes = require("./routes");
 const config = require("./config");
 
 const app = express();
-
+app.use(cors());
 app.get("/hello", routes.hello);
 app.get("/", (req, res) => {
   res.send(`Hello! Welcome to the AirBnB server!`);

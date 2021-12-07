@@ -20,21 +20,21 @@ async function hello(req, res) {
 }
 // info of all listings for table
 async function all_listings(req, res) {
-  pagesize = req.query.pagesize ? req.query.pagesize : 10;
+  pagesize = !isNaN(req.query.pagesize) ? req.query.pagesize : 10;
   row_num = !isNaN(req.query.page) ? (+req.query.page - 1) * pagesize : 0;
 
   connection.query(
     `WITH Price as (Select l.id as id, round(avg(c.price),2) as price
      FROM Listing l LEFT JOIN Calendar c ON l.id = c.listing_id
      group by l.id)
-     select l.id, l.num_views, l.name, l.summary, l.thumbnail_url, p.price, count(r.reviewer_id) as '#reviews'
+     select l.id, l.num_views, l.name, l.summary, l.thumbnail_url, p.price, count(r.reviewer_id) as 'num_reviews'
      FROM Listing l LEFT JOIN Reviews r
      ON l.id  = r.listing_id
      LEFT JOIN Price p
      ON l.id = p.id
      group by l.id
      order by l.id
-     LIMIT ${row_num},${pagesize}`,
+     ${!isNaN(req.query.page) ? `LIMIT ${row_num},${pagesize}` : ""};`,
     function (error, results, fields) {
       if (error) {
         res.json({ error: error });
@@ -47,7 +47,7 @@ async function all_listings(req, res) {
 
 // info of all hosts for table
 async function all_hosts(req, res) {
-  pagesize = req.query.pagesize ? req.query.pagesize : 10;
+  pagesize = !isNaN(req.query.pagesize) ? req.query.pagesize : 10;
   row_num = !isNaN(req.query.page) ? (+req.query.page - 1) * pagesize : 0;
   connection.query(
     `SELECT
@@ -57,9 +57,10 @@ async function all_hosts(req, res) {
        host_response_rate,
        host_response_time,
        host_acceptance_rate,
-       host_total_listings_count
+       host_total_listings_count,
+       host_picture_url
        FROM Host
-       LIMIT ${row_num},${pagesize}`,
+       ${!isNaN(req.query.page) ? `LIMIT ${row_num},${pagesize}` : ""};`,
     function (error, results, fields) {
       if (error) {
         res.json({ error: error });
@@ -203,12 +204,12 @@ async function host(req, res) {
 // get number of bookings for a listing by month
 async function numberbookings(req, res) {
   var date = "`date`";
-  if (req.query.listing) {
+  if (req.query.id) {
     connection.query(
       `SELECT listing_id, MONTH(STR_TO_DATE(${date}, '%Y-%m-%d')) AS month, count(*) as count
-       From
+       Froms
         Calendar
-        WHERE listing_id = '${req.query.listing}'
+        WHERE listing_id = '${req.query.id}'
         GROUP BY month
         ORDER BY month
         `,
@@ -274,7 +275,7 @@ async function monthly_prices(req, res) {
 
 // reviews for a particular listing with pagination
 async function reviews(req, res) {
-  pagesize = req.query.pagesize ? req.query.pagesize : 10;
+  pagesize = !isNaN(req.query.pagesize) ? req.query.pagesize : 10;
   row_num = !isNaN(req.query.page) ? (+req.query.page - 1) * pagesize : 0;
   if (req.query.id) {
     connection.query(
