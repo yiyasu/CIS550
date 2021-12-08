@@ -89,6 +89,7 @@ async function listing(req, res) {
         experiences_offered,
         transit,
         thumbnail_url,
+        l.host_id, 
         host_name,
         host_about,
         host_thumbnail_url
