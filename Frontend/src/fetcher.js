@@ -3,7 +3,7 @@ import config from "./config.json";
 const BASE_PATH = `http://${config.server_host}:${config.server_port}`;
 const ALL_LISTINGS_API = `${BASE_PATH}/all_listings`;
 const ALL_HOSTS_API = `${BASE_PATH}/all_hosts`;
-const LISTING_API = `${BASE_PATH}/lising`;
+const LISTING_API = `${BASE_PATH}/listing`;
 const HOST_API = `${BASE_PATH}/host`;
 const BOOKINGS_WITH_TEMP_API = `${BASE_PATH}/bookings_with_temp`;
 const LISTING_NUM_BOOKINGS_API = `${LISTING_API}/num_bookings`;
