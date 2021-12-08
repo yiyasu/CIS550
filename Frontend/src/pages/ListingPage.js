@@ -8,6 +8,8 @@ import { Col, Container, Row, Card, CardImg, CardBody, CardTitle } from "shards-
 import { Image } from "antd";
 import { Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import Popup from './Popup';
+import './style.css';
 function ListingPage() {
   let { id } = useParams();
   const history = useHistory();
@@ -16,6 +18,11 @@ function ListingPage() {
     host: [],
   });
 
+  const [isOpen, setIsOpen] = useState(false);
+ 
+  const togglePopup = () => {
+    setIsOpen(!isOpen);
+  }
   useEffect(() => {
     getListing(id).then((res) => {
       setListing(res.listing);
@@ -27,6 +34,30 @@ function ListingPage() {
     history.push(`/host/${id}`);
   }
 
+  function AvatarP(props) {
+    const isAvail = props.isAvail; 
+    if (isAvail) {
+      return <Avatar
+
+               
+      src={listing.host_thumbnail_url}
+      size={150}
+      icon={<UserOutlined />}
+      />
+    } else{
+      return null
+    }
+  }
+  function Summary(props) {
+    const isPresent = props.isPresent;
+    if (isPresent) {
+      return <div > 
+      <h4>Summary</h4>
+      <span> {listing.summary} </span>
+    </div>;
+    }
+    return null;
+  }
   return (
     <div>
       <MenuBar />
@@ -39,25 +70,37 @@ function ListingPage() {
             </Col>
             <Col sm="12" lg="8">
               <h1>{listing.name}</h1>
-              <p></p>
+              <div style= {{paddingTop: "24px", paddingBottom: "24px"}} > </div>
+              <div> 
+                <span className="overflow"> {listing.space} </span>
+              </div>
+              <div>
+                <button style={{ padding: "0", border: "none", background: "none" }} type="button" onClick={togglePopup}>
+                  <span style= {{  textDecoration: "underline"}}>Show More</span>
+                </button>
+                {isOpen && <Popup content={<>
+                  <div> 
+                    <h3>About This Space</h3>
+                    <span> {listing.space} </span>
+                    <Summary isPresent={listing.summary} />
+                    <h4> Description </h4>
+                    <span> {listing.description} </span>
+                    <h4> Transit </h4>
+                    <span> {listing.transit} </span>
+                  </div>
+                </>}
+                handleClose={togglePopup}
+                />}
+              </div>
             </Col>
+           
           </Row>
-          <h2>Host</h2>
-          <Card
-            style={{ maxWidth: "300px", cursor: "pointer" }}
-            onClick={() => updateRoute(listing.host_id)}
-          >
-             <div style={{ margin: "1.5rem auto 0rem auto" }}>
-               <Avatar
-               src={listing.host_thumbnail_url}
-               size={150}
-               icon={<UserOutlined />}
-               />
-            </div>
-            <CardBody>
-              <CardTitle>{listing.host_name}</CardTitle>
-              </CardBody>
-          </Card>
+          
+          <h3>Hosted By {listing.host_name} </h3>
+         
+              
+          <AvatarP isAvail={!isOpen} />
+               <button type="button" onClick={() => updateRoute(listing.host_id)}>  See Profile </button>
         </Container>
       </MainContainer>
       </LoadingIndicator>
