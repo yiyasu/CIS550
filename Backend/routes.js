@@ -285,7 +285,7 @@ async function reviews(req, res) {
       `SELECT l.id, r.reviewer_id, r.reviewer_name, r.comments, r.date
      FROM Listing l, Reviews r
      WHERE r.listing_id = l.id and l.id = ${req.query.id}
-     LIMIT ${row_num},${pagesize};`,
+     ${!isNaN(req.query.page) ? `LIMIT ${row_num},${pagesize}` : ""};`,
       function (error, results, fields) {
         if (error) {
           res.json({ error: error });
