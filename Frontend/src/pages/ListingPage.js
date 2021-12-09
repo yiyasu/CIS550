@@ -7,6 +7,8 @@ import { Image } from "antd";
 import { Pagination } from "antd";
 import Popup from './Popup';
 import './style.css';
+import { Avatar } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 import {
   Container,
   Row,
@@ -33,6 +35,9 @@ class ListingPage extends React.Component {
     }
   }
 
+  updateRoute = (id) => {
+    this.props.history.push(`/host/${id}`);
+  };
 
   togglePopup = () => {
     this.setState({isOpen: !this.state.isOpen})
@@ -66,6 +71,21 @@ class ListingPage extends React.Component {
       this.setState({ monthlyPrice: arr});
 
     });
+  }
+
+  AvatarP = (props)=>{
+    const isAvail = props.isAvail; 
+    if (isAvail) {
+      return <Avatar
+
+               
+      src={this.state.listing.host_thumbnail_url}
+      size={150}
+      icon={<UserOutlined />}
+      />
+    } else{
+      return null
+    }
   }
 
   updateResults = (page, pagesize) => {
@@ -131,7 +151,9 @@ class ListingPage extends React.Component {
                 />}
 
         </div>
-
+        <h3>Hosted By {this.state.listing.host_name} </h3>
+        <this.AvatarP isAvail={!this.state.isOpen} />
+               <button type="button" onClick={() => this.updateRoute(this.state.listing.host_id)}>  See Profile </button>
         <h4> Reviews</h4>
         <table>
           <tr>
