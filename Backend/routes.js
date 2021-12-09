@@ -210,7 +210,7 @@ async function numberbookings(req, res) {
   if (req.query.id) {
     connection.query(
       `SELECT listing_id, MONTH(STR_TO_DATE(${date}, '%Y-%m-%d')) AS month, count(*) as count
-       Froms
+       FROM
         Calendar
         WHERE listing_id = '${req.query.id}'
         GROUP BY month
@@ -331,7 +331,7 @@ async function price_with_temp(req, res) {
       INNER JOIN Weather w ON c.date = w.date )
       select floor(temp/10)*10 as range_floor, listing_id, round(avg(price),2) as average_price
       from booking_temps
-      where listing_id = 5506
+      where listing_id = ${req.query.id}
       group by range_floor, listing_id
       order by range_floor;
     `,
