@@ -82,7 +82,7 @@ const getListingPriceWithTemp = async (id) => {
 };
 
 const incrementListingViews = async (id) => {
-  var res = await fetch(LISTING_INC_VIEWS_API, {
+  var res = await fetch(`${LISTING_INC_VIEWS_API}?id=${id}`, {
     method: "POST",
     headers: {
       Accept: "application/json",

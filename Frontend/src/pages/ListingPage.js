@@ -9,29 +9,21 @@ import {
   getListingMonthlyPrices,
   getListingReviews,
 } from "../fetcher";
-import { Image } from "antd";
-import { Pagination } from "antd";
+import { Image, Table } from "antd";
 import Popup from "./Popup";
 import "./style.css";
 import { Avatar } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  CardBody,
-  CardTitle,
-  CardImg,
-} from "shards-react";
+import { Container, Row, Col, Button } from "shards-react";
+
 import Plot from "../components/Plot";
+import Column from "antd/lib/table/Column";
 class ListingPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       id: this.props.match.params.id,
       reviewsResults: [],
-      total: 0,
       listing: { listing_picture_url: "", host: [] },
       isOpen: false,
       prices: [],
@@ -49,9 +41,6 @@ class ListingPage extends React.Component {
   };
   componentDidMount() {
     getListingReviews(this.state.id, null, null).then((res) => {
-      this.setState({ total: res.results.length });
-    });
-    getListingReviews(this.state.id, 1, 10).then((res) => {
       this.setState({ reviewsResults: res.results });
     });
     getListing(this.state.id).then((res) => {
@@ -89,7 +78,7 @@ class ListingPage extends React.Component {
     if (isAvail) {
       return (
         <Avatar
-          src={this.state.listing.host_thumbnail_url}
+          src={this.state.listing.host_picture_url}
           size={150}
           icon={<UserOutlined />}
         />
@@ -127,27 +116,42 @@ class ListingPage extends React.Component {
             <Row>
               <Col sm="12" lg="4">
                 <Image
-                  width={250}
-                  src={this.state.listing.thumbnail_url}
-                  fallback="https://www.russorizio.com/wp-content/uploads/2016/07/ef3-placeholder-image.jpg"
+                  width={350}
+                  src={
+                    this.state.listing.thumbnail_url
+                      ? this.state.listing.thumbnail_url
+                      : "https://www.russorizio.com/wp-content/uploads/2016/07/ef3-placeholder-image.jpg"
+                  }
                 />
               </Col>
               <Col sm="12" lg="8">
-                <h1>{this.state.listing.name}</h1>
-                <div style={{ paddingTop: "24px", paddingBottom: "24px" }}>
-                  {" "}
-                </div>
-                <div>
-                  <span className="overflow"> {this.state.listing.space} </span>
-                  <button
-                    style={{ padding: "0", border: "none", background: "none" }}
-                    type="button"
-                    onClick={this.togglePopup}
-                  >
-                    <span style={{ textDecoration: "underline" }}>
-                      Show More
+                <div style={{ marginLeft: "1.5rem" }}>
+                  <h1>{this.state.listing.name}</h1>
+                  <div
+                    style={{
+                      paddingTop: "24px",
+                      paddingBottom: "24px",
+                    }}
+                  ></div>
+                  <div>
+                    <span className="overflow">
+                      {" "}
+                      {this.state.listing.space}{" "}
                     </span>
-                  </button>
+                    <button
+                      style={{
+                        padding: "0",
+                        border: "none",
+                        background: "none",
+                      }}
+                      type="button"
+                      onClick={this.togglePopup}
+                    >
+                      <span style={{ textDecoration: "underline" }}>
+                        Show More
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </Col>
             </Row>
@@ -160,13 +164,15 @@ class ListingPage extends React.Component {
                   x="Total Price"
                   y="Temperature"
                 />
-                <Plot
+                {/*
+                 Displayed on home page
+                 <Plot
                   dataAvailable={this.state.booking.length !== 0}
                   data={this.state.booking}
                   title="Bookings with Temperature"
                   x="Total Bookings"
                   y="Temperature"
-                />
+                /> */}
                 <Plot
                   dataAvailable={this.state.monthlyPrice.length !== 0}
                   data={this.state.monthlyPrice}
@@ -177,58 +183,69 @@ class ListingPage extends React.Component {
               </Col>
             </Row>
           </Container>
-        </MainContainer>
-        <div>
-          {this.state.isOpen && (
-            <Popup
-              content={
-                <>
-                  <div>
-                    <h3>About This Space</h3>
-                    <span> {this.state.listing.space} </span>
-                    <this.Summary isPresent={this.state.listing.summary} />
-                    <h4> Description </h4>
-                    <span> {this.state.listing.description} </span>
-                    <h4> Transit </h4>
-                    <span> {this.state.listing.transit} </span>
-                  </div>
-                </>
-              }
-              handleClose={this.togglePopup}
+
+          <div>
+            {this.state.isOpen && (
+              <Popup
+                content={
+                  <>
+                    <div>
+                      <h3>About This Space</h3>
+                      <span> {this.state.listing.space} </span>
+                      <this.Summary isPresent={this.state.listing.summary} />
+                      <h4> Description </h4>
+                      <span> {this.state.listing.description} </span>
+                      <h4> Transit </h4>
+                      <span> {this.state.listing.transit} </span>
+                    </div>
+                  </>
+                }
+                handleClose={this.togglePopup}
+              />
+            )}
+          </div>
+
+          <h3 style={{ marginTop: "2rem" }}>
+            Hosted By {this.state.listing.host_name}
+          </h3>
+          <div
+            style={{
+              display: "flex",
+              alignContent: "flex-end",
+              alignItems: "flex-end",
+            }}
+          >
+            <this.AvatarP isAvail={!this.state.isOpen} />
+            <Button
+              size="sm"
+              onClick={() => this.updateRoute(this.state.listing.host_id)}
+            >
+              See Profile
+            </Button>
+          </div>
+          <h4 style={{ marginTop: "2rem" }}> Reviews</h4>
+          <Table
+            dataSource={this.state.reviewsResults}
+            pagination={{
+              pageSizeOptions: [5, 10],
+              defaultPageSize: 5,
+              showQuickJumper: true,
+            }}
+          >
+            <Column
+              title="Name"
+              dataIndex="reviewer_name"
+              key="reviewer_name"
             />
-          )}
-        </div>
-        <h3>Hosted By {this.state.listing.host_name} </h3>
-        <this.AvatarP isAvail={!this.state.isOpen} />
-        <button
-          type="button"
-          onClick={() => this.updateRoute(this.state.listing.host_id)}
-        >
-          {" "}
-          See Profile{" "}
-        </button>
-        <h4> Reviews</h4>
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Review</th>
-          </tr>
-          {this.state.reviewsResults.map((elem) => (
-            <tr key={elem.reviewer_id}>
-              <td>{elem.reviewer_name}</td>
-              <td>{elem.comments}</td>
-              <td>{elem.date}</td>
-            </tr>
-          ))}
-        </table>
-        <div style={{ margin: "2rem", height: "5rem" }}>
-          <Pagination
-            defaultPageSize={10}
-            total={this.state.total}
-            onChange={this.updateResults}
-          />
-        </div>
+            <Column title="Review" dataIndex="comments" key="comments" />
+            <Column
+              title="Date"
+              dataIndex="date"
+              key="date"
+              sorter={(a, b) => a.date.localeCompare(b.date)}
+            />
+          </Table>
+        </MainContainer>
       </div>
     );
   }

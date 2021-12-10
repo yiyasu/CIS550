@@ -1,6 +1,6 @@
 import React from "react";
 
-function Container({ children }) {
+function GridContainer({ children }) {
   return (
     <div
       style={{
@@ -13,4 +13,4 @@ function Container({ children }) {
   );
 }
 
-export default Container;
+export default GridContainer;

@@ -1,11 +1,20 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { getAllListings } from "../fetcher";
+import { getAllListings, incrementListingViews } from "../fetcher";
 import { trimLength } from "../utils";
 import MainContainer from "../components/MainContainer";
 import GridContainer from "../components/GridContainer";
 import LoadingIndicator from "../components/LoadingIndicator";
-import { Card, CardTitle, CardImg, CardBody, CardFooter } from "shards-react";
+import {
+  Container,
+  Col,
+  Row,
+  Card,
+  CardTitle,
+  CardImg,
+  CardBody,
+  CardFooter,
+} from "shards-react";
 
 import { Pagination } from "antd";
 
@@ -37,6 +46,7 @@ class ListingsPage extends React.Component {
 
   updateRoute = (id) => {
     this.props.history.push(`/listing/${id}`);
+    incrementListingViews(id);
   };
 
   render() {
@@ -48,10 +58,18 @@ class ListingsPage extends React.Component {
           <LoadingIndicator isLoading={this.state.listingResults.length === 0}>
             <GridContainer>
               {this.state.listingResults.map(
-                ({ name, summary, price, thumbnail_url, num_reviews, id }) => (
+                ({
+                  name,
+                  summary,
+                  price,
+                  thumbnail_url,
+                  num_reviews,
+                  num_views,
+                  id,
+                }) => (
                   <div key={id} style={{ margin: "1rem 2rem 1rem 0" }}>
                     <Card
-                      style={{ maxWidth: "300px", cursor: "pointer" }}
+                      style={{ maxWidth: "350px", cursor: "pointer" }}
                       onClick={() => this.updateRoute(id)}
                     >
                       <CardImg
@@ -66,30 +84,23 @@ class ListingsPage extends React.Component {
                         <p>{trimLength(summary)}</p>
                       </CardBody>
                       <CardFooter>
-                        <p
-                          style={{
-                            position: "relative",
-                          }}
-                        >
-                          <span
-                            style={{
-                              position: "absolute",
-                              left: 0,
-                            }}
-                          >
-                            <span
-                              style={{ fontWeight: "bold" }}
-                            >{`Reviews: `}</span>
-                            {num_reviews}
-                          </span>
-                          <span
-                            style={{
-                              position: "absolute",
-                              right: 0,
-                              fontWeight: "bold",
-                            }}
-                          >{`$ ${price}`}</span>
-                        </p>
+                        <Container>
+                          <Row>
+                            <Col sm="4">
+                              <span
+                                style={{ fontWeight: "bold" }}
+                              >{`Views `}</span>
+                              {num_views}
+                            </Col>
+                            <Col sm="4">
+                              <span
+                                style={{ fontWeight: "bold" }}
+                              >{`Reviews `}</span>
+                              {num_reviews}
+                            </Col>
+                            <Col sm="4">{`$ ${price}`}</Col>
+                          </Row>
+                        </Container>
                       </CardFooter>
                     </Card>
                   </div>

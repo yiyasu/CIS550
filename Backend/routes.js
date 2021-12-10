@@ -92,7 +92,7 @@ async function listing(req, res) {
         l.host_id, 
         host_name,
         host_about,
-        host_thumbnail_url
+        host_picture_url
         from Listing l, Host h
         where h.host_id = l.host_id and id=${listingId};
         `,

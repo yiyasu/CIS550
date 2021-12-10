@@ -13,10 +13,14 @@ import Plot from "../components/Plot";
 import { getBookingsWithTemp } from "../fetcher";
 
 import MenuBar from "../components/MenuBar";
+import { withRouter } from "react-router-dom";
 
-function HomeCard({ img, text }) {
+function HomeCard({ img, text, onClick }) {
   return (
-    <Card>
+    <Card
+      style={{ maxWidth: "350px", cursor: "pointer" }}
+      onClick={() => onClick(text)}
+    >
       <CardImg src={img} />
       <CardBody>
         <CardTitle>{text}</CardTitle>
@@ -44,19 +48,26 @@ class HomePage extends React.Component {
     });
   }
 
+  changeRoute = (path) => {
+    this.props.history.push(path);
+  };
+
   render() {
     return (
       <div>
         <MenuBar />
         <MainContainer>
-          <h1>About Us</h1>
+          <h1>Home</h1>
 
           <Container>
             <Row>
-              An application which evaluates the relationship between AirBnBs
-              and the weather for the Boston area. Our target user for our web
-              application is a person who lives in Boston and is considering
-              becoming an AirBnB host.{" "}
+              We have evaluated the relationship between AirBnBs and the weather
+              for the Boston area. A person who lives in Boston and is
+              considering becoming an AirBnB host can decide how to price their
+              listing based on the variation in prices and bookings with
+              temperature and time of the year. As an example, check the
+              variation in the number of bookings for all the listings in Boston
+              with the change in temperature.
             </Row>
             <Row>
               <Plot
@@ -67,17 +78,19 @@ class HomePage extends React.Component {
                 y="Temperature"
               />
             </Row>
-            <Row>
+            <Row style={{ marginTop: "2rem" }}>
               <Col sm="12" lg="6">
                 <HomeCard
                   img="https://lucyonlocale.com/wp-content/uploads/2021/02/Single-Blog-Post-Pics-compressed-40.jpg"
                   text="Listings"
+                  onClick={this.changeRoute}
                 />
               </Col>
               <Col sm="12" lg="6">
                 <HomeCard
                   img="https://as1.ftcdn.net/v2/jpg/04/39/40/38/1000_F_439403801_W624JWrUmnGh0yEyWGPWyjQT23r9Au7W.jpg"
                   text="Hosts"
+                  onClick={this.changeRoute}
                 />
               </Col>
             </Row>
@@ -89,4 +102,4 @@ class HomePage extends React.Component {
   }
 }
 
-export default HomePage;
+export default withRouter(HomePage);
