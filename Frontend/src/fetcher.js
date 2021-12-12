@@ -1,5 +1,3 @@
-import config from "./config.json";
-
 // const BASE_PATH = `http://${config.server_host}:${config.server_port}`;
 const BASE_PATH = `https://airbnbwholeproject1.herokuapp.com`;
 const ALL_LISTINGS_API = `${BASE_PATH}/all_listings`;
